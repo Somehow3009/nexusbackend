@@ -11,13 +11,25 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
-const DB_PATH = process.env.NEXUS_DB || path.join(process.cwd(), "data", "nexus.db");
-fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
+function ensurePath(targetPath, fallbackDir, fallbackName) {
+  if (targetPath) {
+    try {
+      fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+      return targetPath;
+    } catch (e) {
+      console.warn(`Cannot use ${targetPath}, fallback to local: ${e.message}`);
+    }
+  }
+  const base = path.join(process.cwd(), fallbackDir);
+  fs.mkdirSync(base, { recursive: true });
+  return fallbackName ? path.join(base, fallbackName) : base;
+}
+
+const DB_PATH = ensurePath(process.env.NEXUS_DB, "data", "nexus.db");
 const db = new Database(DB_PATH);
 
 // Storage for evidence uploads
-const uploadDir = path.join(process.cwd(), "uploads");
-fs.mkdirSync(uploadDir, { recursive: true });
+const uploadDir = ensurePath(process.env.UPLOAD_DIR, "uploads");
 const upload = multer({ dest: uploadDir });
 
 function migrate() {

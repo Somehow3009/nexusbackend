@@ -1,0 +1,18 @@
+{
+  "name": "nexus-backend",
+  "version": "0.1.0",
+  "description": "Lightweight Node/Express backend scaffold for Nexus sync",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.2.0",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "uuid": "^9.0.1"
+  }
+}

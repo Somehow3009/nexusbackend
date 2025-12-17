@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Env and logs
+.env
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS junk
+Thumbs.db
+.DS_Store
+
+# Build/coverage
+coverage/
+dist/
+
+# App data
+data/
+uploads/
+
+# SQLite artifacts
+*.db
+*.sqlite
+*.sqlite-journal
+*.db-shm
+*.db-wal

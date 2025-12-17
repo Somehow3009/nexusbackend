@@ -178,6 +178,7 @@ app.post("/evidence/upload", upload.single("file"), (req, res) => {
 });
 
 app.get("/health", (_req, res) => res.json({ status: "ok", db: DB_PATH }));
+app.get("/", (_req, res) => res.json({ status: "ok" }));
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {

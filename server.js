@@ -42,19 +42,21 @@ async function ensureAuthColumns() {
 }
 
 async function migrate() {
-  const commonTables = `
-    CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, display_name TEXT NOT NULL, email TEXT, password_hash TEXT, password_salt TEXT, created_at TEXT NOT NULL);
-    CREATE TABLE IF NOT EXISTS projects (id TEXT PRIMARY KEY, name TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
-    CREATE TABLE IF NOT EXISTS project_members (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, user_id TEXT NOT NULL, capabilities_json TEXT NOT NULL, created_at TEXT NOT NULL);
-    CREATE TABLE IF NOT EXISTS work_items (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, type TEXT NOT NULL, title TEXT NOT NULL, description TEXT, current_step TEXT NOT NULL, status TEXT NOT NULL, external_link TEXT, created_by_user_id TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
-    CREATE TABLE IF NOT EXISTS task_instances (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, work_item_id TEXT NOT NULL, owner_user_id TEXT NOT NULL, date TEXT NOT NULL, title TEXT NOT NULL, step_key TEXT NOT NULL, estimate_min INTEGER, state TEXT NOT NULL, start_at TEXT, end_at TEXT, time_spent_sec INTEGER DEFAULT 0, done_summary TEXT, blockers TEXT, visibility TEXT NOT NULL DEFAULT 'PRIVATE', submitted_at TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
-    CREATE TABLE IF NOT EXISTS evidence (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, task_instance_id TEXT NOT NULL, type TEXT NOT NULL, uri TEXT NOT NULL, meta_json TEXT NOT NULL, is_keyframe INTEGER NOT NULL DEFAULT 0, visibility TEXT NOT NULL DEFAULT 'PRIVATE', created_at TEXT NOT NULL);
-    CREATE TABLE IF NOT EXISTS artifacts (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, work_item_id TEXT NOT NULL, step_key TEXT NOT NULL, type TEXT NOT NULL, value_type TEXT NOT NULL, value TEXT NOT NULL, visibility TEXT NOT NULL DEFAULT 'PUBLIC', created_by_user_id TEXT NOT NULL, created_at TEXT NOT NULL);
-    CREATE TABLE IF NOT EXISTS compliance_records (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, work_item_id TEXT NOT NULL, step_key TEXT NOT NULL, status TEXT NOT NULL, missing_artifacts_json TEXT NOT NULL, notes TEXT, updated_at TEXT NOT NULL);
-    CREATE TABLE IF NOT EXISTS task_reviews (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, task_instance_id TEXT NOT NULL, reviewer_user_id TEXT NOT NULL, action TEXT NOT NULL, note TEXT, from_visibility TEXT, to_visibility TEXT, created_at TEXT NOT NULL);
-    CREATE TABLE IF NOT EXISTS refresh_tokens (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, token_hash TEXT NOT NULL, expires_at TEXT NOT NULL, revoked INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL);
-  `;
-  await run(commonTables);
+  const statements = [
+    "CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, display_name TEXT NOT NULL, email TEXT, password_hash TEXT, password_salt TEXT, created_at TEXT NOT NULL)",
+    "CREATE TABLE IF NOT EXISTS projects (id TEXT PRIMARY KEY, name TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+    "CREATE TABLE IF NOT EXISTS project_members (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, user_id TEXT NOT NULL, capabilities_json TEXT NOT NULL, created_at TEXT NOT NULL)",
+    "CREATE TABLE IF NOT EXISTS work_items (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, type TEXT NOT NULL, title TEXT NOT NULL, description TEXT, current_step TEXT NOT NULL, status TEXT NOT NULL, external_link TEXT, created_by_user_id TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+    "CREATE TABLE IF NOT EXISTS task_instances (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, work_item_id TEXT NOT NULL, owner_user_id TEXT NOT NULL, date TEXT NOT NULL, title TEXT NOT NULL, step_key TEXT NOT NULL, estimate_min INTEGER, state TEXT NOT NULL, start_at TEXT, end_at TEXT, time_spent_sec INTEGER DEFAULT 0, done_summary TEXT, blockers TEXT, visibility TEXT NOT NULL DEFAULT 'PRIVATE', submitted_at TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+    "CREATE TABLE IF NOT EXISTS evidence (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, task_instance_id TEXT NOT NULL, type TEXT NOT NULL, uri TEXT NOT NULL, meta_json TEXT NOT NULL, is_keyframe INTEGER NOT NULL DEFAULT 0, visibility TEXT NOT NULL DEFAULT 'PRIVATE', created_at TEXT NOT NULL)",
+    "CREATE TABLE IF NOT EXISTS artifacts (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, work_item_id TEXT NOT NULL, step_key TEXT NOT NULL, type TEXT NOT NULL, value_type TEXT NOT NULL, value TEXT NOT NULL, visibility TEXT NOT NULL DEFAULT 'PUBLIC', created_by_user_id TEXT NOT NULL, created_at TEXT NOT NULL)",
+    "CREATE TABLE IF NOT EXISTS compliance_records (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, work_item_id TEXT NOT NULL, step_key TEXT NOT NULL, status TEXT NOT NULL, missing_artifacts_json TEXT NOT NULL, notes TEXT, updated_at TEXT NOT NULL)",
+    "CREATE TABLE IF NOT EXISTS task_reviews (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, task_instance_id TEXT NOT NULL, reviewer_user_id TEXT NOT NULL, action TEXT NOT NULL, note TEXT, from_visibility TEXT, to_visibility TEXT, created_at TEXT NOT NULL)",
+    "CREATE TABLE IF NOT EXISTS refresh_tokens (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, token_hash TEXT NOT NULL, expires_at TEXT NOT NULL, revoked INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL)",
+  ];
+  for (const stmt of statements) {
+    await run(stmt);
+  }
   await ensureAuthColumns();
 }
 migrate();
